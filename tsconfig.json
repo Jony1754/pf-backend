@@ -1,0 +1,21 @@
+{
+  "include": [
+    "src/**/*.ts",
+    "src/types/**/*.d.ts" // Asegúrate de que TypeScript procese los archivos .d.ts en el directorio /types
+  ],
+
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types", "src/types/types.d.ts"],
+    "types": ["node"]
+  },
+  "exclude": ["node_modules"]
+}
