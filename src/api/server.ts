@@ -17,6 +17,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(verifyToken);
 app.use(router);
 
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
 sequelize
   .authenticate()
   .then(() => {
