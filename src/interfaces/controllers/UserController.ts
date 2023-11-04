@@ -11,6 +11,17 @@ export class UserController {
     return user;
   }
 
+  async login(userData: any) {
+    if (userData.email) {
+      console.log('login: ', userData.email);
+      const user = await this.userRepository.findByEmail(userData.email);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user;
+    }
+  }
+
   async getUserById(userId: number) {
     console.log('getUserById: ', userId);
     return await this.userRepository.getById(userId);

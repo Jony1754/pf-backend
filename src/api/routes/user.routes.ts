@@ -1,7 +1,7 @@
 import express from 'express';
 import { UserRepository } from '../../interfaces/drivers/UserRepository';
 import { UserController } from '../../interfaces/controllers/UserController';
-
+import { CustomRequest } from '../../types/CustomRequest';
 const router = express.Router();
 
 // Inicializar controlador y repositorio
@@ -12,6 +12,15 @@ const userController = new UserController(userRepository);
 router.post('/register', async (req, res) => {
   try {
     const user = await userController.register(req.body);
+    res.status(201).json(user);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.post('/login', async (req: CustomRequest, res) => {
+  try {
+    const user = await userController.login(req.user);
     res.status(201).json(user);
   } catch (error: any) {
     res.status(400).json({ message: error.message });

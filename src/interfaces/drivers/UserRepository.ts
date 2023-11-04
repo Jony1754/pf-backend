@@ -4,6 +4,12 @@ export class UserRepository {
     return await UserDB.create(userData);
   }
 
+  async findByEmail(email: string): Promise<UserDB | null> {
+    return await UserDB.findOne({ where: { email: email } });
+  }
+
+  
+
   async getById(userId: number): Promise<UserDB | null> {
     return await UserDB.findByPk(userId);
   }

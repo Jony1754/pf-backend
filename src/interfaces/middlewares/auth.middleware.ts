@@ -16,6 +16,7 @@ export const verifyToken = async (
   try {
     const decodedToken = await auth.verifyIdToken(token);
     req.user = decodedToken;
+    // console.log('decodedToken: ', decodedToken);
     next();
   } catch (error) {
     res.status(401).send('Invalid token');

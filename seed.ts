@@ -3,6 +3,7 @@ import { CommerceDB } from './src/infrastructure/database/CommerceDB';
 import { ProductDB } from './src/infrastructure/database/ProductDB';
 import { TransactionDB } from './src/infrastructure/database/TransactionDB';
 import { QRCodeDB } from './src/infrastructure/database/QRCodeDB';
+import { auth } from './src/infrastructure/firebase/authentication';
 import sequelize from './src/infrastructure/database/database';
 import bcrypt from 'bcrypt';
 import QRCode from 'qrcode';
@@ -11,7 +12,27 @@ async function seedDatabase() {
   console.log('Connection has been established successfully.');
   await sequelize.sync({ force: true });
 
+  const password = 'password_for_john';
   const hashedPassword = await bcrypt.hash('password_for_john', 10);
+
+  const firebaseUser0 = await auth.createUser({
+    email: 'jony1754@hotmail.com',
+    password: password,
+    displayName: 'Jonathan Arias',
+  });
+
+  const firebaseUser1 = await auth.createUser({
+    email: 'john@example.com',
+    password: password,
+    displayName: 'John Doe',
+  });
+
+  const user0 = await UserDB.create({
+    name: 'Jonathan Arias',
+    email: 'jony1754@hotmail.com',
+    password: hashedPassword,
+    balance: 100.0,
+  });
 
   const user1 = await UserDB.create({
     name: 'John Doe',
