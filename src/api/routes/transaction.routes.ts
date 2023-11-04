@@ -31,8 +31,6 @@ router.post(
     try {
       const { userId, commerceId, productId } = req.body;
 
-      // Verificaciones adicionales pueden ir aquí
-
       const transaction = await transactionController.createTransaction(
         userId,
         commerceId,
