@@ -13,7 +13,7 @@ export class UserController {
 
   async login(userData: any) {
     if (userData.email) {
-      console.log('login: ', userData.email);
+      console.log('login: ', userData);
       const user = await this.userRepository.findByEmail(userData.email);
       if (!user) {
         throw new Error('User not found');

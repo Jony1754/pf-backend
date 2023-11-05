@@ -13,6 +13,12 @@ export class UserDB extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+  })
+  imgUri!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
     unique: true,
   })
   email!: string;
