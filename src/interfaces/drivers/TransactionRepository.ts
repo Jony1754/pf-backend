@@ -1,4 +1,7 @@
+import { CommerceDB } from '../../infrastructure/database/CommerceDB';
+import { ProductDB } from '../../infrastructure/database/ProductDB';
 import { TransactionDB } from '../../infrastructure/database/TransactionDB';
+import { TransactionDetailDB } from '../../infrastructure/database/TransactionDetailDB';
 import { UserDB } from '../../infrastructure/database/UserDB';
 
 export class TransactionRepository {
@@ -15,10 +18,31 @@ export class TransactionRepository {
     });
 
     return await TransactionDB.findAll({
-      where: {
-        userId: user?.id,
-      },
+      where: { userId: user?.id }, // Reemplaza con el ID del usuario deseado
+      include: [
+        {
+          model: TransactionDetailDB,
+          attributes: ['quantity', 'price'], // Incluye solo la cantidad y el precio
+          include: [
+            {
+              model: ProductDB,
+              attributes: ['name', 'price'], // Incluye solo el nombre y el precio del producto
+            },
+          ],
+        },
+        {
+          model: CommerceDB,
+          attributes: ['name'], // Incluye solo el nombre del comercio
+        },
+      ],
+      attributes: ['id', 'date', 'amount', 'status'], // Atributos específicos de la transacción
     });
+
+    // return await TransactionDB.findAll({
+    //   where: {
+    //     userId: user?.id,
+    //   },
+    // });
   }
   // Obtener transacciones por ID de usuario
   async getByUserId(userId: number): Promise<TransactionDB[]> {

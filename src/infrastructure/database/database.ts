@@ -6,6 +6,7 @@ import { TransactionDB } from './TransactionDB';
 import { QRCodeDB } from './QRCodeDB';
 
 import { config } from 'dotenv';
+import { TransactionDetailDB } from './TransactionDetailDB';
 
 // const sequelize = new Sequelize('qrcommerce', 'root', 'admin', {
 //   host: 'localhost',
@@ -26,7 +27,14 @@ const sequelize = new Sequelize(
   {
     host: DATABASE_HOST,
     dialect: 'mysql',
-    models: [UserDB, CommerceDB, ProductDB, TransactionDB, QRCodeDB],
+    models: [
+      UserDB,
+      CommerceDB,
+      ProductDB,
+      TransactionDB,
+      TransactionDetailDB,
+      QRCodeDB,
+    ],
   }
 );
 export default sequelize;

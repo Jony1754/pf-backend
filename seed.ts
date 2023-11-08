@@ -8,6 +8,7 @@ import sequelize from './src/infrastructure/database/database';
 import bcrypt from 'bcrypt';
 import QRCode from 'qrcode';
 import { randomInt } from 'crypto';
+import { TransactionDetailDB } from './src/infrastructure/database/TransactionDetailDB';
 async function seedDatabase() {
   await sequelize.authenticate();
   console.log('Connection has been established successfully.');
@@ -32,29 +33,31 @@ async function seedDatabase() {
     'Universal Travel Adapter',
   ];
 
-  const firebaseUser0 = await auth.createUser({
-    email: 'jony1754@hotmail.com',
-    password: password,
-    displayName: 'Jonathan Arias',
-  });
+  // ONLY NEED TO RUN THIS ONCE TO CREATE THE USERS IN FIREBASE
 
-  const firebaseUser1 = await auth.createUser({
-    email: 'john@example.com',
-    password: password,
-    displayName: 'John Doe',
-  });
+  // const firebaseUser0 = await auth.createUser({
+  //   email: 'jony1754@hotmail.com',
+  //   password: password,
+  //   displayName: 'Jonathan Arias',
+  // });
 
-  const firebaseUser2 = await auth.createUser({
-    email: 'alice@example.com',
-    password: password,
-    displayName: 'Alice Smith',
-  });
+  // const firebaseUser1 = await auth.createUser({
+  //   email: 'john@example.com',
+  //   password: password,
+  //   displayName: 'John Doe',
+  // });
 
-  const firebaseUser3 = await auth.createUser({
-    email: 'bob@example.com',
-    password: password,
-    displayName: 'Bob Johnson',
-  });
+  // const firebaseUser2 = await auth.createUser({
+  //   email: 'alice@example.com',
+  //   password: password,
+  //   displayName: 'Alice Smith',
+  // });
+
+  // const firebaseUser3 = await auth.createUser({
+  //   email: 'bob@example.com',
+  //   password: password,
+  //   displayName: 'Bob Johnson',
+  // });
 
   const user0 = await UserDB.create({
     name: 'Jonathan Arias',
@@ -95,62 +98,60 @@ async function seedDatabase() {
     address: 'Puerto Colombia KM5, Atlantico, Colombia',
   });
 
-  const product1 = await ProductDB.create({
-    name: 'Widget',
-    price: 9.99,
-    commerceId: commerce1.id,
-  });
+  const products = await Promise.all(
+    PRODUCTS.map(async (productName, index) => {
+      const product = await ProductDB.create({
+        name: productName,
+        price: (index + 1) * 10 + randomInt(0, 99) / 100, // Genera un precio aleatorio
+        commerceId: commerce1.id,
+      });
+      console.log('product created: ', product.dataValues);
+      // Genera un código QR para cada producto
+      const qrCodeData = await QRCode.toDataURL(product.id.toString());
+      await QRCodeDB.create({
+        productId: product.id,
+        code: qrCodeData,
+      });
+      return product;
+    })
+  );
 
-  for (let i = 1; i <= 10; i++) {
-    const product = await ProductDB.create({
-      name: `${PRODUCTS[i - 1]}`,
-      price: i * 10 + randomInt(0, 99) / 100,
-      commerceId: commerce1.id,
-    });
+  // Crea transacciones con detalles para cada usuario
+  for (const user of [user0, user1, user2, user3]) {
+    // Crea un número aleatorio de transacciones para cada usuario
+    const numTransactions = randomInt(1, 5); // Por ejemplo, cada usuario tendrá de 1 a 4 transacciones
+    for (let t = 0; t < numTransactions; t++) {
+      let totalAmount = 0;
+      const transaction = await TransactionDB.create({
+        userId: user.id,
+        commerceId: commerce1.id,
+        date: new Date(),
+        amount: 0, // Inicializa en 0 y actualiza después con el monto total
+        status: 'completed',
+      });
 
-    console.log('product created: ', product.dataValues);
+      // Crea una lista aleatoria de productos para la transacción actual
+      const numProducts = randomInt(1, products.length); // Número aleatorio de productos para esta transacción
+      const purchasedProducts = products
+        .sort(() => 0.5 - Math.random())
+        .slice(0, numProducts);
 
-    // Generate a QR code for each product
-    const qrCodeData = await QRCode.toDataURL(product.id.toString());
-    await QRCodeDB.create({
-      productId: product.id,
-      code: qrCodeData,
-    });
+      for (const product of purchasedProducts) {
+        const quantity = randomInt(1, 3); // Cantidad aleatoria de cada producto
+        const price = product.price * quantity;
+        totalAmount += price;
+        await TransactionDetailDB.create({
+          transactionId: transaction.id,
+          productId: product.id,
+          quantity: quantity,
+          price: product.price, // Usa el precio unitario del producto
+        });
+      }
 
-    // Create transactions for each user with different products
-    await TransactionDB.create({
-      userId: user2.id,
-      commerceId: commerce1.id,
-      productId: product.id,
-      date: new Date(),
-      amount: product.price,
-      status: 'completed',
-    });
-
-    await TransactionDB.create({
-      userId: user3.id,
-      commerceId: commerce1.id,
-      productId: product.id,
-      date: new Date(),
-      amount: product.price,
-      status: 'completed',
-    });
+      // Actualiza el monto total de la transacción
+      await transaction.update({ amount: totalAmount });
+    }
   }
-
-  const qrCodeData = await QRCode.toDataURL(product1.id.toString());
-  await QRCodeDB.create({
-    productId: product1.id,
-    code: qrCodeData,
-  });
-
-  await TransactionDB.create({
-    userId: user1.id,
-    commerceId: commerce1.id,
-    productId: product1.id,
-    date: new Date(),
-    amount: product1.price,
-    status: 'completed',
-  });
 
   console.log('Database seeded!');
 }

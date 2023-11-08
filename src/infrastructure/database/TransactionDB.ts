@@ -5,10 +5,12 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { UserDB } from './UserDB';
 import { CommerceDB } from './CommerceDB';
 import { ProductDB } from './ProductDB';
+import { TransactionDetailDB } from './TransactionDetailDB';
 
 @Table
 export class TransactionDB extends Model {
@@ -26,12 +28,15 @@ export class TransactionDB extends Model {
   @BelongsTo(() => CommerceDB)
   commerce!: CommerceDB;
 
-  @ForeignKey(() => ProductDB)
-  @Column
-  productId!: number;
+  // @ForeignKey(() => ProductDB)
+  // @Column
+  // productId!: number;
 
-  @BelongsTo(() => ProductDB)
-  product!: ProductDB;
+  // @BelongsTo(() => ProductDB)
+  // product!: ProductDB;
+
+  @HasMany(() => TransactionDetailDB)
+  details!: TransactionDetailDB[];
 
   @Column({
     type: DataType.DATE,
