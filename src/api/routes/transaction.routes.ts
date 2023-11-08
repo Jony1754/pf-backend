@@ -4,6 +4,7 @@ import { TransactionRepository } from '../../interfaces/drivers/TransactionRepos
 import { UserRepository } from '../../interfaces/drivers/UserRepository';
 import { CommerceRepository } from '../../interfaces/drivers/CommerceRepository';
 import { ProductRepository } from '../../interfaces/drivers/ProductRepository';
+import { CustomRequest } from '../../types/CustomRequest';
 
 // Middleware para autenticación (deberías tenerlo en algún lugar de tu código)
 // import { authenticate } from './middleware/authenticate';
@@ -42,9 +43,12 @@ router.post(
     }
   }
 );
-router.get('/', async (req, res) => {
+router.get('/', async (req: CustomRequest, res) => {
   try {
-    const transactions = await transactionController.getAllTransactions();
+    const transactions = await transactionController.getAllTransactions(
+      req.user.email
+    );
+    console.log('req.user en transaction.routes: ', req.user);
     res.json(transactions);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

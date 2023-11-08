@@ -21,8 +21,8 @@ export class TransactionController {
     this.productRepository = productRepository;
   }
 
-  async getAllTransactions() {
-    return this.transactionRepository.getAll();
+  async getAllTransactions(userEmail: string) {
+    return this.transactionRepository.getAll(userEmail);
   }
 
   async createTransaction(

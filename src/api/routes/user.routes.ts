@@ -20,6 +20,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req: CustomRequest, res) => {
   try {
+    console.log('req.user in /users/login: ', req.user);
     const user = await userController.login(req.user);
     res.status(201).json(user);
   } catch (error: any) {

@@ -15,6 +15,7 @@ export const verifyToken = async (
 
   try {
     const decodedToken = await auth.verifyIdToken(token);
+    console.log('decodedToken: ', decodedToken);
     req.user = decodedToken;
     // console.log('decodedToken: ', decodedToken);
     next();
