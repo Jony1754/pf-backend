@@ -10,6 +10,7 @@ export class CartController {
   public async addItemToCart(req: Request, res: Response): Promise<Response> {
     const { userId, productId, quantity } = req.body;
 
+    // TODO: When you add a product to the cart, you first get the QR code and this returns the product you want to add to the cart.
     // You may want to add validation or transformation logic here.
     if (!userId || !productId || !quantity) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -28,6 +29,8 @@ export class CartController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  
 
   public async getCart(req: Request, res: Response): Promise<Response> {
     const { userId } = req.params;
