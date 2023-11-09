@@ -1,0 +1,91 @@
+import { Request, Response } from 'express';
+import { CartRepository } from '../drivers/CartRepository';
+export class CartController {
+  private cartRepository: CartRepository;
+
+  constructor(cartRepository: CartRepository) {
+    this.cartRepository = cartRepository;
+  }
+
+  public async addItemToCart(req: Request, res: Response): Promise<Response> {
+    const { userId, productId, quantity } = req.body;
+
+    // You may want to add validation or transformation logic here.
+    if (!userId || !productId || !quantity) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+      const price = await this.calculatePrice(productId, quantity); // Assume this is a method to calculate price.
+      const cartItem = await this.cartRepository.addItemToCart(
+        userId,
+        productId,
+        quantity,
+        price
+      );
+      return res.status(201).json(cartItem);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  public async getCart(req: Request, res: Response): Promise<Response> {
+    const { userId } = req.params;
+
+    try {
+      const cartItems = await this.cartRepository.getCartByUserId(
+        parseInt(userId)
+      );
+      return res.status(200).json(cartItems);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  public async updateCartItem(req: Request, res: Response): Promise<Response> {
+    const { productId, quantity, price } = req.body;
+
+    if (!productId || !quantity) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+      const updatedCartItem = await this.cartRepository.updateCartItem(
+        productId,
+        quantity,
+        price
+      );
+      return res.status(200).json(updatedCartItem);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  public async removeCartItem(req: Request, res: Response): Promise<Response> {
+    const { cartItemId } = req.params;
+
+    try {
+      const success = await this.cartRepository.removeCartItem(
+        parseInt(cartItemId)
+      );
+      if (success) {
+        return res.status(204).send();
+      } else {
+        return res.status(404).json({ message: 'Cart item not found' });
+      }
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ... other controller methods as needed
+
+  private async calculatePrice(
+    productId: number,
+    quantity: number
+  ): Promise<number> {
+    // Implement the logic to calculate the price based on productId and quantity.
+    // This could involve calling another service or repository method.
+    return 0; // Placeholder for the actual price calculation logic.
+  }
+}
