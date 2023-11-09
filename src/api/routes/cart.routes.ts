@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { CartController } from '../../interfaces/controllers/CartController';
 import { CartRepository } from '../../interfaces/drivers/CartRepository';
+import { ProductRepository } from '../../interfaces/drivers/ProductRepository';
 const router = Router();
 
 // Instantiate the repository and controller
 const cartRepository = new CartRepository();
-const cartController = new CartController(cartRepository);
+const productRepository = new ProductRepository();
+const cartController = new CartController(cartRepository, productRepository);
 
 // POST request to add an item to the cart
 router.post('/', (req, res) => cartController.addItemToCart(req, res));

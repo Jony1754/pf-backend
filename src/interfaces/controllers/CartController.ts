@@ -1,10 +1,16 @@
 import { Request, Response } from 'express';
 import { CartRepository } from '../drivers/CartRepository';
+import { ProductRepository } from '../drivers/ProductRepository';
 export class CartController {
   private cartRepository: CartRepository;
+  private productRepository: ProductRepository;
 
-  constructor(cartRepository: CartRepository) {
+  constructor(
+    cartRepository: CartRepository,
+    productRepository: ProductRepository
+  ) {
     this.cartRepository = cartRepository;
+    this.productRepository = productRepository;
   }
 
   public async addItemToCart(req: Request, res: Response): Promise<Response> {
@@ -24,13 +30,11 @@ export class CartController {
         quantity,
         price
       );
-      return res.status(201).json(cartItem);
+      return res.status(201).json({ message: 'Item added to cart', cartItem });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }
-
-  
 
   public async getCart(req: Request, res: Response): Promise<Response> {
     const { userId } = req.params;
@@ -81,14 +85,15 @@ export class CartController {
     }
   }
 
-  // ... other controller methods as needed
-
   private async calculatePrice(
     productId: number,
     quantity: number
   ): Promise<number> {
-    // Implement the logic to calculate the price based on productId and quantity.
-    // This could involve calling another service or repository method.
-    return 0; // Placeholder for the actual price calculation logic.
+    const product = await this.productRepository.getById(productId);
+    if (product) {
+      return product.price * quantity;
+    }
+
+    return 0;
   }
 }
