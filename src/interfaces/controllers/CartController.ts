@@ -30,7 +30,13 @@ export class CartController {
         quantity,
         price
       );
-      return res.status(201).json({ message: 'Item added to cart', cartItem });
+      const product = await this.productRepository.getById(productId);
+      return res.status(201).json({
+        message: 'Item added to cart',
+        productName: product?.name,
+        originalPrice: product?.price,
+        cartItem,
+      });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
