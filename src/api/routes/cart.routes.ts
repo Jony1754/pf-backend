@@ -8,18 +8,18 @@ const cartRepository = new CartRepository();
 const cartController = new CartController(cartRepository);
 
 // POST request to add an item to the cart
-router.post('/cart', (req, res) => cartController.addItemToCart(req, res));
+router.post('/', (req, res) => cartController.addItemToCart(req, res));
 
 // GET request to retrieve a user's cart
-router.get('/cart/:userId', (req, res) => cartController.getCart(req, res));
+router.get('/:userId', (req, res) => cartController.getCart(req, res));
 
 // PUT request to update a cart item's quantity
-router.put('/cart/item/:cartItemId', (req, res) =>
+router.put('/item/:cartItemId', (req, res) =>
   cartController.updateCartItem(req, res)
 );
 
 // DELETE request to remove a cart item
-router.delete('/cart/item/:cartItemId', (req, res) =>
+router.delete('/item/:cartItemId', (req, res) =>
   cartController.removeCartItem(req, res)
 );
 
