@@ -1,16 +1,20 @@
 import { Request, Response } from 'express';
 import { CartRepository } from '../drivers/CartRepository';
 import { ProductRepository } from '../drivers/ProductRepository';
+import { UserRepository } from '../drivers/UserRepository';
+import { CustomRequest } from '../../types/CustomRequest';
 export class CartController {
   private cartRepository: CartRepository;
   private productRepository: ProductRepository;
-
+  private userRepository: UserRepository;
   constructor(
     cartRepository: CartRepository,
-    productRepository: ProductRepository
+    productRepository: ProductRepository,
+    userRepository: UserRepository
   ) {
     this.cartRepository = cartRepository;
     this.productRepository = productRepository;
+    this.userRepository = userRepository;
   }
 
   public async addItemToCart(req: Request, res: Response): Promise<Response> {
@@ -42,12 +46,12 @@ export class CartController {
     }
   }
 
-  public async getCart(req: Request, res: Response): Promise<Response> {
-    const { userId } = req.params;
-
+  public async getCart(req: CustomRequest, res: Response): Promise<Response> {
+    const user = req.user;
+    const userData = await this.userRepository.findByEmail(user.email);
     try {
       const cartItems = await this.cartRepository.getCartByUserId(
-        parseInt(userId)
+        parseInt(userData?.id)
       );
       return res.status(200).json(cartItems);
     } catch (error: any) {
