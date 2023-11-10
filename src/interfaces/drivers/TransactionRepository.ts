@@ -17,9 +17,24 @@ export class TransactionRepository {
       },
     });
 
-    return await TransactionDB.findAll({
+    const transactions = await TransactionDB.findAll({
       where: { userId: user?.id }, // Reemplaza con el ID del usuario deseado
+
       include: [
+        {
+          model: CommerceDB,
+          attributes: ['name', 'nit'], // Incluye solo el nombre del comercio
+        },
+        {
+          model: TransactionDetailDB,
+          attributes: ['quantity', 'price'],
+          include: [
+            {
+              model: ProductDB,
+              attributes: ['name', 'price'],
+            },
+          ],
+        },
         {
           model: TransactionDetailDB,
           attributes: ['quantity', 'price'], // Incluye solo la cantidad y el precio
@@ -30,13 +45,19 @@ export class TransactionRepository {
             },
           ],
         },
-        {
-          model: CommerceDB,
-          attributes: ['name'], // Incluye solo el nombre del comercio
-        },
       ],
       attributes: ['id', 'date', 'amount', 'status'], // Atributos específicos de la transacción
     });
+
+    for (const transaction of transactions) {
+      let totalQuantity = 0;
+      transaction.details.forEach((detail) => {
+        totalQuantity += detail.quantity;
+      });
+      transaction.dataValues.totalQuantity = totalQuantity; // Add totalQuantity to the transaction object
+    }
+
+    return transactions;
 
     // return await TransactionDB.findAll({
     //   where: {

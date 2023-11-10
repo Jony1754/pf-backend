@@ -24,6 +24,12 @@ export class CommerceDB extends Model {
   })
   address!: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  nit!: string;
+
   @ForeignKey(() => UserDB)
   @Column
   userId!: number;

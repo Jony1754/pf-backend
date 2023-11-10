@@ -96,6 +96,7 @@ async function seedDatabase() {
   const commerce1 = await CommerceDB.create({
     name: "KM5's Store",
     address: 'Puerto Colombia KM5, Atlantico, Colombia',
+    nit: '123456789-1',
   });
 
   const products = await Promise.all(
