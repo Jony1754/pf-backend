@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ProductController } from '../../interfaces/controllers/ProductController';
 import { ProductRepository } from '../../interfaces/drivers/ProductRepository';
 import { QRCodeRepository } from '../../interfaces/drivers/QRCodeRepository';
+import QRCode from 'qrcode';
 const router = Router();
 
 const productRepository = new ProductRepository();
@@ -32,7 +33,27 @@ router.get('/:productId/qr', async (req, res) => {
   }
 });
 
-router.get('/qr', async (req, res) => {
+router.get('/test', async (req, res) => {
+  const id = 1;
+  const options = {
+    errorCorrectionLevel: 'H', // you can adjust this as needed
+    type: 'image/png',
+    quality: 0.3, // lower quality for smaller size
+    margin: 1,
+    color: {
+      dark: '#000', // QR Code color
+      light: '#FFF', // Background color
+    },
+    scale: 2, // Adjust scaling for size
+    mode: 'Numeric', // Specify Numeric mode
+  };
+
+  const qrData = await QRCode.toDataURL(id.toString(), {
+    errorCorrectionLevel: 'H',
+  });
+});
+
+router.post('/qr', async (req, res) => {
   console.log('req.body: ', req.body.qrcode);
   // res.json({ message: 'got in /products/qr' });
 
