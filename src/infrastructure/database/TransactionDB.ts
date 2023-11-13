@@ -39,7 +39,7 @@ export class TransactionDB extends Model {
   details!: TransactionDetailDB[];
 
   @Column({
-    type: DataType.DATE,
+    type: DataType.STRING,
     allowNull: false,
     defaultValue: DataType.NOW,
   })

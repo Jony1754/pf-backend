@@ -11,7 +11,9 @@ const productController = new ProductController(
   qrCodeRepository
 );
 
-router.get('/products', async (req, res) => {
+router.get('/', async (req, res) => {
+  console.log('got in /products');
+  console.log('req.params: ', req.params);
   try {
     const products = await productController.getAllProducts();
     res.json(products);
@@ -20,11 +22,25 @@ router.get('/products', async (req, res) => {
   }
 });
 
-router.get('/products/:productId/qr', async (req, res) => {
+router.get('/:productId/qr', async (req, res) => {
   try {
     const productId = parseInt(req.params.productId, 10);
     const qr = await productController.getQRByProductId(productId);
     res.json(qr);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/qr', async (req, res) => {
+  console.log('req.body: ', req.body.qrcode);
+  // res.json({ message: 'got in /products/qr' });
+
+  try {
+    const qrcode = req.body.qrcode;
+    console.log('qrCode: ', qrcode);
+    const product = await productController.getProductIdByQRCode(qrcode);
+    res.json(product);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

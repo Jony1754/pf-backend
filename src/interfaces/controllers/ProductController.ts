@@ -43,4 +43,8 @@ export class ProductController {
   async getQRByProductId(productId: number) {
     return await this.productRepository.getQRByProductId(productId);
   }
+
+  async getProductIdByQRCode(qrCode: string) {
+    return await this.productRepository.getProductIdByQRCode(qrCode);
+  }
 }

@@ -9,6 +9,18 @@ import bcrypt from 'bcrypt';
 import QRCode from 'qrcode';
 import { randomInt } from 'crypto';
 import { TransactionDetailDB } from './src/infrastructure/database/TransactionDetailDB';
+
+function formatDate(date: Date) {
+  const d = new Date(date);
+  let month = '' + (d.getMonth() + 1);
+  let day = '' + d.getDate();
+  const year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [month, day, year].join('/');
+}
 async function seedDatabase() {
   await sequelize.authenticate();
   console.log('Connection has been established successfully.');
@@ -21,16 +33,16 @@ async function seedDatabase() {
   const hashedPassword = await bcrypt.hash('password', 10);
 
   const PRODUCTS = [
-    'Bluetooth Noise-Canceling Headphones',
-    'Smart Fitness Watch',
-    'Portable Solar Charger',
-    'Wireless Ergonomic Keyboard',
-    'Virtual Reality Headset',
-    'Drone with HD Camera',
-    'Handheld Gimbal Stabilizer',
-    'Smart Home Hub',
-    'Waterproof Bluetooth Speaker',
-    'Universal Travel Adapter',
+    'Hatsu Tea',
+    'Alfajor Milka',
+    'Doritos Nacho Cheese',
+    'Detodito natural',
+    'Cheetos',
+    'Brownie de chocolate',
+    'Agua Brisa 500ml',
+    'Takis Fuego',
+    'Natuchips',
+    'Chocolatina Jet',
   ];
 
   // ONLY NEED TO RUN THIS ONCE TO CREATE THE USERS IN FIREBASE
@@ -103,7 +115,7 @@ async function seedDatabase() {
     PRODUCTS.map(async (productName, index) => {
       const product = await ProductDB.create({
         name: productName,
-        price: (index + 1) * 10 + randomInt(0, 99) / 100, // Genera un precio aleatorio
+        price: (index + 1) * 100 + randomInt(0, 1000) / 100, // Genera un precio aleatorio
         commerceId: commerce1.id,
       });
       console.log('product created: ', product.dataValues);
@@ -126,7 +138,7 @@ async function seedDatabase() {
       const transaction = await TransactionDB.create({
         userId: user.id,
         commerceId: commerce1.id,
-        date: new Date(),
+        date: formatDate(new Date()),
         amount: 0, // Inicializa en 0 y actualiza después con el monto total
         status: 'completed',
       });
