@@ -6,6 +6,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { UserDB } from './UserDB';
 import { ProductDB } from './ProductDB';
@@ -19,6 +20,9 @@ export class CartDB extends Model {
   @ForeignKey(() => ProductDB)
   @Column
   productId!: number;
+
+  @BelongsTo(() => ProductDB)
+  product!: ProductDB;
 
   @Column({
     type: DataType.INTEGER,
