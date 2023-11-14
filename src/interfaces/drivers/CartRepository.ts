@@ -1,4 +1,5 @@
 import { CartDB } from '../../infrastructure/database/CartDB';
+import { ProductDB } from '../../infrastructure/database/ProductDB';
 export class CartRepository {
   async addItemToCart(
     userId: number,
@@ -18,7 +19,12 @@ export class CartRepository {
   async getCartByUserId(userId: number): Promise<CartDB[]> {
     const cartItems = await CartDB.findAll({
       where: { userId },
-      include: [{ all: true }], // Depending on your relations, you might want to include related entities here.
+      include: [
+        {
+          model: ProductDB,
+          as: 'product',
+        },
+      ], // Depending on your relations, you might want to include related entities here.
     });
     return cartItems;
   }
