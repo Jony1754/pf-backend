@@ -1,13 +1,19 @@
+// src/api/routes/checkout.routes.ts
+
 import { Router } from 'express';
 import { CheckoutController } from '../../interfaces/controllers/CheckoutController';
 import { CheckoutService } from '../../services/checkout.service';
+import { UserRepository } from '../../interfaces/drivers/UserRepository';
 const router = Router();
-
-// Instantiate the service and controller
 const checkoutService = new CheckoutService();
-const checkoutController = new CheckoutController(checkoutService);
+const userReposiory = new UserRepository();
+const checkoutController = new CheckoutController(
+  checkoutService,
+  userReposiory
+);
 
-// POST request to handle checkout
-router.post('/', (req, res) => checkoutController.checkout(req, res));
+router.post('/checkout', (req, res) =>
+  checkoutController.handleCheckout(req, res)
+);
 
 export default router;

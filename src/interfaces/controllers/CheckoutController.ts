@@ -1,22 +1,35 @@
+// src/interfaces/controllers/checkout.controller.ts
+
 import { Request, Response } from 'express';
 import { CheckoutService } from '../../services/checkout.service';
 import { CustomRequest } from '../../types/CustomRequest';
+import { UserRepository } from '../drivers/UserRepository';
 export class CheckoutController {
   private checkoutService: CheckoutService;
-
-  constructor(checkoutService: CheckoutService) {
+  private userReposiory: UserRepository;
+  constructor(
+    checkoutService: CheckoutService,
+    userRepository: UserRepository
+  ) {
     this.checkoutService = checkoutService;
+    this.userReposiory = userRepository;
   }
 
-  public async checkout(req: CustomRequest, res: Response): Promise<Response> {
-    const userId = req.user.id; // Assuming you have user information available in the request object, typically added by a middleware after authentication
-    const commerceId = req.body.commerceId; // The ID of the commerce would be sent in the request body, or determined in some other way depending on your application logic
-
+  async handleCheckout(req: CustomRequest, res: Response) {
     try {
-      await this.checkoutService.checkout(userId, commerceId);
-      return res.status(200).json({ message: 'Checkout successful' });
+      const user = req.user;
+      const userData = await this.userReposiory.findByEmail(user.email);
+
+      const paymentMethodId = req.body.paymentMethodId;
+      const transaction = await this.checkoutService.processCheckout(
+        userData?.id,
+        paymentMethodId
+      );
+      return res.status(200).json(transaction);
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  // ... otros métodos según sea necesario
 }

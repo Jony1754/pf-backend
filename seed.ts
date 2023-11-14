@@ -2,6 +2,7 @@ import { UserDB } from './src/infrastructure/database/UserDB';
 import { CommerceDB } from './src/infrastructure/database/CommerceDB';
 import { ProductDB } from './src/infrastructure/database/ProductDB';
 import { TransactionDB } from './src/infrastructure/database/TransactionDB';
+import { PaymentMethodDB } from './src/infrastructure/database/PaymentMethodDB';
 import { QRCodeDB } from './src/infrastructure/database/QRCodeDB';
 import { auth } from './src/infrastructure/firebase/authentication';
 import sequelize from './src/infrastructure/database/database';
@@ -9,7 +10,11 @@ import bcrypt from 'bcrypt';
 import QRCode from 'qrcode';
 import { randomInt } from 'crypto';
 import { TransactionDetailDB } from './src/infrastructure/database/TransactionDetailDB';
+import crypto from 'crypto';
 
+function generateCardIdentifier(cardNumber: string): string {
+  return crypto.createHash('sha256').update(cardNumber).digest('hex');
+}
 function formatDate(date: Date) {
   const d = new Date(date);
   let month = '' + (d.getMonth() + 1);
@@ -129,6 +134,71 @@ async function seedDatabase() {
     })
   );
 
+  let tarjetasDePrueba = [
+    {
+      cardType: 'Visa',
+      cardNumber: '4242424242424242',
+      lastFourDigits: '4242',
+      balance: 1000,
+    },
+    {
+      cardType: 'Visa',
+      cardNumber: '4012888888881881',
+      lastFourDigits: '1881',
+      balance: 1200,
+    },
+    {
+      cardType: 'MasterCard',
+      cardNumber: '5555555555554444',
+      lastFourDigits: '4444',
+      balance: 800,
+    },
+    {
+      cardType: 'MasterCard',
+      cardNumber: '2223003122003222',
+      lastFourDigits: '3222',
+      balance: 950,
+    },
+    {
+      cardType: 'American Express',
+      cardNumber: '378282246310005',
+      lastFourDigits: '0005',
+      balance: 1100,
+    },
+    {
+      cardType: 'Discover',
+      cardNumber: '6011111111111117',
+      lastFourDigits: '1117',
+      balance: 700,
+    },
+    {
+      cardType: 'Diners Club',
+      cardNumber: '3056930009020004',
+      lastFourDigits: '0004',
+      balance: 500,
+    },
+    {
+      cardType: 'JCB',
+      cardNumber: '3530111333300000',
+      lastFourDigits: '0000',
+      balance: 850,
+    },
+    // Tarjetas que simulan casos específicos
+    {
+      cardType: 'Visa (rechazada)',
+      cardNumber: '4000000000000002',
+      lastFourDigits: '0002',
+      balance: 0,
+    },
+    {
+      cardType: 'MasterCard (sin fondos)',
+      cardNumber: '5105105105105100',
+      lastFourDigits: '5100',
+      balance: 0,
+    },
+    // Puedes agregar más tarjetas según lo necesites
+  ];
+
   // Crea transacciones con detalles para cada usuario
   for (const user of [user0, user1, user2, user3]) {
     // Crea un número aleatorio de transacciones para cada usuario
@@ -164,6 +234,27 @@ async function seedDatabase() {
       // Actualiza el monto total de la transacción
       await transaction.update({ amount: totalAmount });
     }
+  }
+  tarjetasDePrueba = tarjetasDePrueba.sort(() => 0.5 - Math.random());
+
+  // Asignar tarjetas de manera aleatoria a cada usuario
+  for (const user of [user0, user1, user2, user3]) {
+    const numberOfCards = randomInt(1, 3); // Asignar 1 o 2 tarjetas
+    const tarjetasSeleccionadas = tarjetasDePrueba.slice(0, numberOfCards);
+
+    for (const tarjeta of tarjetasSeleccionadas) {
+      const cardIdentifier = generateCardIdentifier(tarjeta.cardNumber);
+      await PaymentMethodDB.create({
+        userId: user.id,
+        cardType: tarjeta.cardType,
+        lastFourDigits: tarjeta.cardNumber.slice(-4),
+        cardIdentifier,
+        balance: tarjeta.balance,
+      });
+    }
+
+    // Eliminar las tarjetas seleccionadas para evitar duplicados
+    tarjetasDePrueba = tarjetasDePrueba.slice(numberOfCards);
   }
 
   console.log('Database seeded!');

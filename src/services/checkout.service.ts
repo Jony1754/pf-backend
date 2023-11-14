@@ -1,40 +1,47 @@
 // src/services/CheckoutService.ts
-import sequelize from '../infrastructure/database/database';
-import { TransactionDB } from '../infrastructure/database/TransactionDB';
-import { TransactionDetailDB } from '../infrastructure/database/TransactionDetailDB';
-import { UserDB } from '../infrastructure/database/UserDB';
+
 import { CartDB } from '../infrastructure/database/CartDB';
+import { TransactionDB } from '../infrastructure/database/TransactionDB';
+import { PaymentMethodDB } from '../infrastructure/database/PaymentMethodDB';
+import { TransactionDetailDB } from '../infrastructure/database/TransactionDetailDB';
+import sequelize from '../infrastructure/database/database';
 
 export class CheckoutService {
-  // Injecting repositories might be required here
-  async checkout(userId: number, commerceId: number): Promise<void> {
+  async processCheckout(userId: number, paymentMethodId: number) {
     const transaction = await sequelize.transaction();
 
     try {
-      // Fetch user's cart items
+      // Verificar y obtener los ítems del carrito
       const cartItems = await CartDB.findAll({
         where: { userId },
         transaction,
       });
 
-      // Calculate the total amount
+      // Calcular el total
       const totalAmount = cartItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
       );
 
-      // Create a new transaction
+      // Obtener el método de pago
+      const paymentMethod = await PaymentMethodDB.findByPk(paymentMethodId, {
+        transaction,
+      });
+      if (!paymentMethod || paymentMethod.balance < totalAmount) {
+        throw new Error('Método de pago inválido o saldo insuficiente');
+      }
+
+      // Crear la transacción
       const newTransaction = await TransactionDB.create(
         {
           userId,
-          commerceId,
           status: 'pending',
-          totalAmount,
+          amount: totalAmount,
         },
         { transaction }
       );
 
-      // Create transaction details
+      // Crear los detalles de la transacción
       for (const item of cartItems) {
         await TransactionDetailDB.create(
           {
@@ -47,27 +54,20 @@ export class CheckoutService {
         );
       }
 
-      // Deduct the total amount from the user's balance
-      const user = await UserDB.findByPk(userId, { transaction });
-      if (!user) throw new Error('User not found');
-      if (user.balance < totalAmount) throw new Error('Insufficient funds');
+      // Actualizar el saldo del método de pago
+      paymentMethod.balance -= totalAmount;
+      await paymentMethod.save({ transaction });
 
-      user.balance -= totalAmount;
-      await user.save({ transaction });
-
-      // Optional: Increment commerce's balance here if required
-
-      // Update transaction to 'completed'
+      // Actualizar el estado de la transacción
       newTransaction.status = 'completed';
       await newTransaction.save({ transaction });
 
-      // Clear the user's cart
+      // Limpiar el carrito
       await CartDB.destroy({ where: { userId }, transaction });
 
-      // Commit the transaction
       await transaction.commit();
+      return newTransaction;
     } catch (error) {
-      // Rollback the transaction in case of an error
       await transaction.rollback();
       throw error;
     }
