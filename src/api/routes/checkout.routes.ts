@@ -12,8 +12,6 @@ const checkoutController = new CheckoutController(
   userReposiory
 );
 
-router.post('/checkout', (req, res) =>
-  checkoutController.handleCheckout(req, res)
-);
+router.post('/', (req, res) => checkoutController.handleCheckout(req, res));
 
 export default router;

@@ -17,9 +17,11 @@ export class CartController {
     this.userRepository = userRepository;
   }
 
-  public async addItemToCart(req: Request, res: Response): Promise<Response> {
-    const { userId, productId, quantity } = req.body;
-
+  public async addItemToCart(req: CustomRequest, res: Response): Promise<Response> {
+    const { productId, quantity } = req.body;
+    const user = req.user;
+    const userData = await this.userRepository.findByEmail(user.email);
+    const userId = parseInt(userData?.id);
     // TODO: When you add a product to the cart, you first get the QR code and this returns the product you want to add to the cart.
     // You may want to add validation or transformation logic here.
     if (!userId || !productId || !quantity) {
@@ -59,8 +61,13 @@ export class CartController {
     }
   }
 
-  public async updateCartItem(req: Request, res: Response): Promise<Response> {
-    const { productId, quantity, price } = req.body;
+  public async updateCartItem(
+    req: CustomRequest,
+    res: Response
+  ): Promise<Response> {
+    const { productId, quantity } = req.body;
+    const user = req.user;
+    const userData = await this.userRepository.findByEmail(user.email);
 
     if (!productId || !quantity) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -70,9 +77,11 @@ export class CartController {
       const updatedCartItem = await this.cartRepository.updateCartItem(
         productId,
         quantity,
-        price
+        parseInt(userData?.id)
       );
-      return res.status(200).json(updatedCartItem);
+      return res
+        .status(200)
+        .json({ message: 'Cart item updated successfuly', updatedCartItem });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
@@ -86,7 +95,7 @@ export class CartController {
         parseInt(cartItemId)
       );
       if (success) {
-        return res.status(204).send();
+        return res.status(200).json('Cart item deleted');
       } else {
         return res.status(404).json({ message: 'Cart item not found' });
       }

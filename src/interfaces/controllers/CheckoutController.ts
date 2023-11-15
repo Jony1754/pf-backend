@@ -27,6 +27,8 @@ export class CheckoutController {
       );
       return res.status(200).json(transaction);
     } catch (error: any) {
+      console.log(error);
+      console.log('error en checkout: ', error.message);
       return res.status(500).json({ error: error.message });
     }
   }

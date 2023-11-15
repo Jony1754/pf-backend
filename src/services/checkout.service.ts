@@ -1,5 +1,5 @@
 // src/services/CheckoutService.ts
-
+import { formatDate } from '../utils/formatDate';
 import { CartDB } from '../infrastructure/database/CartDB';
 import { TransactionDB } from '../infrastructure/database/TransactionDB';
 import { PaymentMethodDB } from '../infrastructure/database/PaymentMethodDB';
@@ -17,18 +17,25 @@ export class CheckoutService {
         transaction,
       });
 
+      if (cartItems.length === 0) {
+        throw new Error('No hay ítems en el carrito');
+      }
+
+      console.log('cartItems: ', cartItems);
+      const auxProduct = cartItems[0].product;
+      const commerceId = auxProduct?.commerceId;
+
       // Calcular el total
-      const totalAmount = cartItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      );
+      const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
 
       // Obtener el método de pago
       const paymentMethod = await PaymentMethodDB.findByPk(paymentMethodId, {
         transaction,
       });
       if (!paymentMethod || paymentMethod.balance < totalAmount) {
-        throw new Error('Método de pago inválido o saldo insuficiente');
+        throw new Error(
+          `Método de pago inválido o saldo insuficiente, balance: ${paymentMethod?.balance}, totalAmount: ${totalAmount}`
+        );
       }
 
       // Crear la transacción
@@ -37,6 +44,8 @@ export class CheckoutService {
           userId,
           status: 'pending',
           amount: totalAmount,
+          commerceId,
+          date: formatDate(new Date()),
         },
         { transaction }
       );

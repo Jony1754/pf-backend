@@ -30,10 +30,11 @@ export class CartRepository {
   }
 
   async updateCartItem(
-    userId: number,
     productId: number,
-    quantity: number
+    quantity: number,
+    userId: number
   ): Promise<CartDB> {
+    // Buscar el ítem en el carrito
     const cartItem = await CartDB.findOne({
       where: { userId, productId },
     });
@@ -42,13 +43,25 @@ export class CartRepository {
       throw new Error('Cart item not found');
     }
 
+    // Buscar el producto para obtener el precio unitario
+    const product = await ProductDB.findByPk(productId);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    // Calcular el nuevo precio total
+    const newPrice = product.price * quantity;
+
+    // Actualizar la cantidad y el precio en el carrito
     cartItem.quantity = quantity;
+    cartItem.price = newPrice;
+
     await cartItem.save();
 
     return cartItem;
   }
-
   async removeCartItem(cartItemId: number): Promise<boolean> {
+    console.log('removeCartItem: ', cartItemId);
     const deleted = await CartDB.destroy({
       where: { id: cartItemId },
     });

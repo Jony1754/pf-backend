@@ -41,4 +41,6 @@ const sequelize = new Sequelize(
     ],
   }
 );
+UserDB.hasMany(PaymentMethodDB, { foreignKey: 'userId' });
+PaymentMethodDB.belongsTo(UserDB, { foreignKey: 'userId' });
 export default sequelize;

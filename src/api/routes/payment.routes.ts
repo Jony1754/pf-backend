@@ -12,13 +12,9 @@ const paymentController = new PaymentController(
   userReposiory
 );
 
-router.post('/payment', (req, res) =>
-  paymentController.addPaymentMethod(req, res)
-);
-router.get('/payment', (req, res) =>
-  paymentController.getPaymentMethods(req, res)
-);
-router.delete('/payment/:paymentMethodId', (req, res) =>
+router.post('/', (req, res) => paymentController.addPaymentMethod(req, res));
+router.get('/', (req, res) => paymentController.getPaymentMethods(req, res));
+router.delete('/:paymentMethodId', (req, res) =>
   paymentController.deletePaymentMethod(req, res)
 );
 

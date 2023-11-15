@@ -1,3 +1,4 @@
+import { PaymentMethodDB } from '../../infrastructure/database/PaymentMethodDB';
 import { UserDB } from '../../infrastructure/database/UserDB';
 export class UserRepository {
   async create(userData: any): Promise<UserDB> {
@@ -8,10 +9,10 @@ export class UserRepository {
     return await UserDB.findOne({ where: { email: email } });
   }
 
-  
-
   async getById(userId: number): Promise<UserDB | null> {
-    return await UserDB.findByPk(userId);
+    return await UserDB.findByPk(userId, {
+      include: [PaymentMethodDB],
+    });
   }
   async updateBalance(userId: number, amount: number): Promise<UserDB> {
     const user = await UserDB.findByPk(userId);

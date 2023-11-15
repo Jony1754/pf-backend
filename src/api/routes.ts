@@ -6,6 +6,7 @@ import transactionRoutes from './routes/transaction.routes';
 import qrcodeRoutes from './routes/qrcode.routes';
 import cartRoutes from './routes/cart.routes';
 import checkoutRoutes from './routes/checkout.routes';
+import paymentRoutes from './routes/payment.routes';
 const router = express.Router();
 
 router.use('/users', userRoutes);
@@ -15,4 +16,5 @@ router.use('/cart', cartRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/qrcodes', qrcodeRoutes);
 router.use('/checkout', checkoutRoutes);
+router.use('/payment', paymentRoutes);
 export default router;

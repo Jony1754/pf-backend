@@ -1,6 +1,7 @@
 import { Model, Table, Column, DataType, HasMany } from 'sequelize-typescript';
 import { CommerceDB } from './CommerceDB';
 import { TransactionDB } from './TransactionDB';
+import { PaymentMethodDB } from './PaymentMethodDB';
 
 @Table
 export class UserDB extends Model {
@@ -9,6 +10,9 @@ export class UserDB extends Model {
     allowNull: false,
   })
   name!: string;
+  
+  @HasMany(() => PaymentMethodDB)
+  paymentMethods!: PaymentMethodDB[];
 
   @Column({
     type: DataType.STRING,

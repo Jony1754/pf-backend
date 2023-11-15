@@ -22,9 +22,7 @@ router.post('/', (req, res) => cartController.addItemToCart(req, res));
 router.get('/', (req, res) => cartController.getCart(req, res));
 
 // PUT request to update a cart item's quantity
-router.put('/item/:cartItemId', (req, res) =>
-  cartController.updateCartItem(req, res)
-);
+router.put('/item', (req, res) => cartController.updateCartItem(req, res));
 
 // DELETE request to remove a cart item
 router.delete('/item/:cartItemId', (req, res) =>

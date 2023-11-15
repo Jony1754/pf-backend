@@ -6,6 +6,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { UserDB } from './UserDB';
 
@@ -14,7 +15,8 @@ export class PaymentMethodDB extends Model {
   @ForeignKey(() => UserDB)
   @Column
   userId!: number;
-
+  @BelongsTo(() => UserDB)
+  user!: UserDB;
   @Column({
     type: DataType.STRING,
     allowNull: false,

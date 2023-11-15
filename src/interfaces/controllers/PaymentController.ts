@@ -15,11 +15,13 @@ export class PaymentController {
     this.userReposiory = userRepository;
   }
 
-  async addPaymentMethod(req: Request, res: Response) {
-    const { userId, cardNumber, cardType, lastFourDigits, balance } = req.body;
+  async addPaymentMethod(req: CustomRequest, res: Response) {
+    const { cardNumber, cardType, lastFourDigits, balance } = req.body;
+    const user = req.user;
+    const userData = await this.userReposiory.findByEmail(user.email);
     try {
       const paymentMethod = await this.paymentRepository.createPaymentMethod(
-        userId,
+        userData?.id,
         cardNumber,
         cardType,
         lastFourDigits,
@@ -48,7 +50,7 @@ export class PaymentController {
     const { paymentMethodId } = req.params;
     try {
       await this.paymentRepository.deletePaymentMethod(Number(paymentMethodId));
-      return res.status(204).send();
+      return res.status(200).json({ message: 'Payment method deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
