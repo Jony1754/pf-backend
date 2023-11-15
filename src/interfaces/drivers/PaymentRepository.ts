@@ -75,7 +75,7 @@ function generateCardIdentifier(cardNumber: string): string {
   return crypto.createHash('sha256').update(cardNumber).digest('hex');
 }
 export class PaymentRepository {
-  async createPaymentMethod(
+  async   createPaymentMethod(
     userId: number,
     cardNumber: string,
     cardType: string,
