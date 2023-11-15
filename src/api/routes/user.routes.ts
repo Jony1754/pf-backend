@@ -28,9 +28,11 @@ router.post('/login', async (req: CustomRequest, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/', async (req: CustomRequest, res) => {
+  const user = req.user;
+  const userData = await userRepository.findByEmail(user.email);
   try {
-    const user = await userController.getUserById(Number(req.params.id));
+    const user = await userController.getUserById(Number(userData?.id));
     if (user) {
       res.json(user);
     } else {
