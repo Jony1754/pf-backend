@@ -16,7 +16,15 @@ export class PaymentController {
   }
 
   async addPaymentMethod(req: CustomRequest, res: Response) {
-    const { cardNumber, cardType, lastFourDigits, balance } = req.body;
+    const {
+      cardNumber,
+      cardType,
+      lastFourDigits,
+      balance,
+      cvc,
+      expirationDay,
+      expirationMonth,
+    } = req.body;
     const user = req.user;
     const userData = await this.userReposiory.findByEmail(user.email);
     try {
@@ -25,7 +33,10 @@ export class PaymentController {
         cardNumber,
         cardType,
         lastFourDigits,
-        balance
+        balance,
+        cvc,
+        expirationDay,
+        expirationMonth
       );
       return res.status(201).json(paymentMethod);
     } catch (error: any) {

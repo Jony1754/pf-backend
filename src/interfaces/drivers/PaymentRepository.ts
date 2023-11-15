@@ -7,48 +7,65 @@ let tarjetasDePrueba = [
     cardType: 'Visa',
     cardNumber: '4242424242424242',
     lastFourDigits: '4242',
+    expirationDate: '12/26',
+    cvc: '123',
     balance: 100000,
   },
   {
     cardType: 'Visa',
     cardNumber: '4012888888881881',
     lastFourDigits: '1881',
+    expirationDate: '12/26',
+    cvc: '499',
+
     balance: 120000,
   },
   {
     cardType: 'MasterCard',
     cardNumber: '5555555555554444',
     lastFourDigits: '4444',
+    expirationDate: '12/26',
+    cvc: '123',
     balance: 8000,
   },
   {
     cardType: 'MasterCard',
     cardNumber: '2223003122003222',
     lastFourDigits: '3222',
+    expirationDate: '09/26',
+    cvc: '421',
     balance: 9500,
   },
   {
     cardType: 'American Express',
     cardNumber: '378282246310005',
     lastFourDigits: '0005',
+    expirationDate: '09/26',
+    cvc: '431',
     balance: 11000,
   },
   {
     cardType: 'Discover',
     cardNumber: '6011111111111117',
     lastFourDigits: '1117',
+    expirationDate: '09/26',
+    cvc: '324',
     balance: 730000,
   },
   {
     cardType: 'Diners Club',
     cardNumber: '3056930009020004',
     lastFourDigits: '0004',
+    expirationDate: '09/26',
+    cvc: '123',
     balance: 50000,
   },
   {
     cardType: 'JCB',
     cardNumber: '3530111333300000',
     lastFourDigits: '0000',
+    expirationDate: '09/26',
+    cvc: '123',
     balance: 85050,
   },
   // Tarjetas que simulan casos específicos
@@ -56,12 +73,16 @@ let tarjetasDePrueba = [
     cardType: 'Visa (rechazada)',
     cardNumber: '4000000000000002',
     lastFourDigits: '0002',
+    expirationDate: '09/26',
+    cvc: '521',
     balance: 0,
   },
   {
     cardType: 'MasterCard (sin fondos)',
     cardNumber: '5105105105105100',
     lastFourDigits: '5100',
+    expirationDate: '09/26',
+    cvc: '421',
     balance: 0,
   },
   // Puedes agregar más tarjetas según lo necesites
@@ -75,12 +96,15 @@ function generateCardIdentifier(cardNumber: string): string {
   return crypto.createHash('sha256').update(cardNumber).digest('hex');
 }
 export class PaymentRepository {
-  async   createPaymentMethod(
+  async createPaymentMethod(
     userId: number,
     cardNumber: string,
     cardType: string,
     lastFourDigits: string,
-    balance: number
+    balance: number,
+    expirationDay: string,
+    expirationMonth: string,
+    cvc: string
   ) {
     // Verificar si la tarjeta está en la lista permitida
     if (!TARJETAS_PERMITIDAS.includes(cardNumber)) {
@@ -105,6 +129,9 @@ export class PaymentRepository {
       lastFourDigits,
       cardIdentifier,
       balance,
+      expirationDay,
+      expirationMonth,
+      cvc,
     });
   }
 

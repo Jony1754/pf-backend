@@ -139,67 +139,95 @@ async function seedDatabase() {
       cardType: 'Visa',
       cardNumber: '4242424242424242',
       lastFourDigits: '4242',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '123',
       balance: 100000,
     },
     {
       cardType: 'Visa',
       cardNumber: '4012888888881881',
       lastFourDigits: '1881',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '499',
+
       balance: 120000,
     },
     {
       cardType: 'MasterCard',
       cardNumber: '5555555555554444',
       lastFourDigits: '4444',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '123',
       balance: 8000,
     },
     {
       cardType: 'MasterCard',
       cardNumber: '2223003122003222',
       lastFourDigits: '3222',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '421',
       balance: 9500,
     },
     {
       cardType: 'American Express',
       cardNumber: '378282246310005',
       lastFourDigits: '0005',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '431',
       balance: 11000,
     },
     {
       cardType: 'Discover',
       cardNumber: '6011111111111117',
       lastFourDigits: '1117',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '324',
       balance: 730000,
     },
     {
       cardType: 'Diners Club',
       cardNumber: '3056930009020004',
       lastFourDigits: '0004',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '123',
       balance: 50000,
     },
     {
       cardType: 'JCB',
       cardNumber: '3530111333300000',
       lastFourDigits: '0000',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '123',
       balance: 85050,
     },
-    // Tarjetas que simulan casos específicos
     {
       cardType: 'Visa (rechazada)',
       cardNumber: '4000000000000002',
       lastFourDigits: '0002',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '521',
       balance: 0,
     },
     {
       cardType: 'MasterCard (sin fondos)',
       cardNumber: '5105105105105100',
       lastFourDigits: '5100',
+      expirationDay: '26',
+      expirationMonth: '09',
+      cvc: '421',
       balance: 0,
     },
-    // Puedes agregar más tarjetas según lo necesites
   ];
 
-  // Crea transacciones con detalles para cada usuario
   for (const user of [user0, user1, user2, user3]) {
     // Crea un número aleatorio de transacciones para cada usuario
     const numTransactions = randomInt(1, 5); // Por ejemplo, cada usuario tendrá de 1 a 4 transacciones
@@ -210,7 +238,7 @@ async function seedDatabase() {
         commerceId: commerce1.id,
         date: formatDate(new Date()),
         amount: 0, // Inicializa en 0 y actualiza después con el monto total
-        status: 'completed',
+        status: 'vencida',
       });
 
       // Crea una lista aleatoria de productos para la transacción actual
@@ -250,6 +278,9 @@ async function seedDatabase() {
         lastFourDigits: tarjeta.cardNumber.slice(-4),
         cardIdentifier,
         balance: tarjeta.balance,
+        expirationDay: tarjeta.expirationDay,
+        expirationMonth: tarjeta.expirationMonth,
+        cvc: tarjeta.cvc,
       });
     }
 

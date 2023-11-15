@@ -36,6 +36,24 @@ export class PaymentMethodDB extends Model {
   cardIdentifier!: string;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  expirationDay!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  expirationMonth!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  cvc!: string;
+
+  @Column({
     type: DataType.FLOAT,
     allowNull: false,
     defaultValue: 1000.0,
