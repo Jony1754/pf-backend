@@ -14,6 +14,7 @@ export class CheckoutService {
       // Verificar y obtener los ítems del carrito
       const cartItems = await CartDB.findAll({
         where: { userId },
+        include: ['product'],
         transaction,
       });
 
@@ -23,7 +24,9 @@ export class CheckoutService {
 
       console.log('cartItems: ', cartItems);
       const auxProduct = cartItems[0].product;
+      console.log('auxProduct: ', auxProduct);
       const commerceId = auxProduct?.commerceId;
+      console.log('commerceId: ', commerceId);
 
       // Calcular el total
       const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
