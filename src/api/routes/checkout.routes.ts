@@ -14,4 +14,5 @@ const checkoutController = new CheckoutController(
 
 router.post('/', (req, res) => checkoutController.handleCheckout(req, res));
 
+console.log('checkout.routes.ts test git credentials');
 export default router;
